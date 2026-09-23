@@ -1,6 +1,7 @@
 #include <chrono>
 
 #include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 
 using namespace std::chrono_literals;
 
@@ -14,23 +15,53 @@ public:
             this->get_logger(),
             "Mini Robot started!");
 
-        timer_ = this->create_wall_timer(
-            200ms,
-            std::bind(&RobotNode::timer_callback, this));
+        subscriber_ =
+            this->create_subscription<geometry_msgs::msg::Twist>(
+                "/cmd_vel",
+                10,
+                std::bind(
+                    &RobotNode::cmd_vel_callback,
+                    this,
+                    std::placeholders::_1));
+
+        timer_ =
+            this->create_wall_timer(
+                500ms,
+                std::bind(
+                    &RobotNode::timer_callback,
+                    this));
     }
 
 private:
-    void timer_callback()
+    void cmd_vel_callback(
+        const geometry_msgs::msg::Twist::SharedPtr msg)
     {
-        x_ = x_ + 0.1;
+        velocity_ = msg->linear.x;
 
         RCLCPP_INFO(
             this->get_logger(),
-            "Robot position: x = %.1f",
+            "Received velocity: %.2f m/s",
+            velocity_);
+    }
+
+    void timer_callback()
+    {
+        double dt = 0.5;
+
+        x_ = x_ + velocity_ * dt;
+
+        RCLCPP_INFO(
+            this->get_logger(),
+            "Robot position: x = %.2f m",
             x_);
     }
 
     double x_ = 0.0;
+
+    double velocity_ = 0.0;
+
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr
+        subscriber_;
 
     rclcpp::TimerBase::SharedPtr timer_;
 };
