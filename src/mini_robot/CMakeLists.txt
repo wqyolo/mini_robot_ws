@@ -8,6 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -22,14 +23,24 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(robot_node src/robot_node.cpp)
+add_executable(control_node src/control_node.cpp)
+
+ament_target_dependencies(
+  control_node
+  rclcpp
+  geometry_msgs
+)
 
 ament_target_dependencies(
   robot_node
   rclcpp
+  geometry_msgs
 )
 
 install(
-  TARGETS robot_node
+  TARGETS
+  robot_node
+  control_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

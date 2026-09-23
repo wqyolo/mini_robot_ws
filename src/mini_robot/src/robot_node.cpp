@@ -15,7 +15,7 @@ public:
             "Mini Robot started!");
 
         timer_ = this->create_wall_timer(
-            1s,
+            200ms,
             std::bind(&RobotNode::timer_callback, this));
     }
 
