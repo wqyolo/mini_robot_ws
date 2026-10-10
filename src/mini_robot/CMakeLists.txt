@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(example_interfaces REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -26,6 +27,12 @@ endif()
 add_executable(robot_node src/robot_node.cpp)
 add_executable(control_node src/control_node.cpp)
 add_executable(sensor_node src/sensor_node.cpp)
+add_executable(localization_node src/localization_node.cpp)
+add_executable(
+  planning_node
+  src/planning_node.cpp
+)
+
 
 ament_target_dependencies(
   control_node
@@ -44,6 +51,20 @@ ament_target_dependencies(
   sensor_node
   rclcpp
   std_msgs
+)
+
+ament_target_dependencies(
+  localization_node
+  rclcpp
+  std_msgs
+)
+
+ament_target_dependencies(
+  planning_node
+  rclcpp
+  std_msgs
+  geometry_msgs
+  example_interfaces
 )
 
 install(
@@ -51,6 +72,8 @@ install(
   robot_node
   control_node
   sensor_node
+  localization_node
+  planning_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
